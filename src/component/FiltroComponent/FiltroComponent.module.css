@@ -5,7 +5,7 @@
   border-radius: 12px;
   padding: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  width: 100%;
+  width: 94%;
   margin-bottom: 20px;
   font-family: 'Poppins', sans-serif;
 }
@@ -51,4 +51,10 @@
   background-color: #FF0033;
   color: white;
   font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .filtroContainer {
+    width: 95%;
+  }
 }

@@ -106,8 +106,20 @@
   height: 18px;
 }
 
+@media (max-width: 1600px) {
+    .searchContainer {
+        position: relative;
+        width: 90%;
+    }
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
+    .searchContainer {
+        position: relative;
+        width: 90%;
+    }
+
   .contentContainer {
     flex-direction: column;
   }
