@@ -4,6 +4,8 @@ import FiltroComponent from '../../component/FiltroComponent/FiltroComponent';
 import style from './AtividadesPage.module.css';
 import searchIcon from '../../assets/img/search-icon.svg';
 import exitIcon from '../../assets/img/exit-icon.svg';
+import { db } from '../../firebase'; // Importe o Firestore
+import { collection, getDocs, query, orderBy } from "firebase/firestore"; // Funções do Firestore
 
 function AtividadesPage() {
   const [atividades, setAtividades] = useState([]);
@@ -36,23 +38,21 @@ function AtividadesPage() {
     return null;
   };
 
-  // Simulação de uma chamada à API
+  // Recupera as atividades do Firestore
   useEffect(() => {
     const fetchAtividades = async () => {
       try {
-        const dadosSimulados = [
-          { id: 1, nome: 'Reunião de Equipe', data: '2025-03-01', horario: '10:00' },
-          { id: 2, nome: 'Treinamento React', data: '2025-03-01', horario: '16:00' },
-          { id: 3, nome: 'Review de Projeto', data: '2025-03-02', horario: '11:30' },
-          { id: 4, nome: 'Planejamento Mensal', data: '2025-03-13', horario: '09:30' },
-          { id: 5, nome: 'Desenvolvimento UI', data: '2025-03-03', horario: '17:00' },
-          { id: 6, nome: 'RGB UI', data: '2025-03-05', horario: '22:00' },
-        ];
-        
-        setAtividades(dadosSimulados);
-        setAtividadesFiltradas(dadosSimulados);
+        const q = query(collection(db, "atividades"), orderBy("data", "desc")); // Ordena por data
+        const querySnapshot = await getDocs(q);
+        const atividadesData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          data: doc.data().data?.toDate(), // Converte o timestamp do Firestore para Date
+        }));
+        setAtividades(atividadesData);
+        setAtividadesFiltradas(atividadesData);
       } catch (error) {
-        console.error('Erro ao buscar atividades:', error);
+        console.error("Erro ao buscar atividades:", error);
       }
     };
 
@@ -65,8 +65,8 @@ function AtividadesPage() {
 
     // Aplicar filtro de pesquisa
     if (searchTerm) {
-      resultado = resultado.filter(item => 
-        item.nome.toLowerCase().includes(searchTerm.toLowerCase())
+      resultado = resultado.filter(item =>
+        item.email.toLowerCase().includes(searchTerm.toLowerCase()) // Filtra por e-mail
       );
     }
 
@@ -75,7 +75,7 @@ function AtividadesPage() {
       const intervalo = calcularIntervaloDatas(filtroAtivo.DATA);
       if (intervalo) {
         resultado = resultado.filter(item => {
-          const dataAtividade = new Date(item.data);
+          const dataAtividade = item.data; // Já é um objeto Date
           return dataAtividade >= intervalo.inicio && dataAtividade < intervalo.fim;
         });
       }
@@ -84,22 +84,22 @@ function AtividadesPage() {
     // Aplicar filtros de horário
     if (filtroAtivo.HORÁRIO && filtroAtivo.HORÁRIO !== 'Todos') {
       const periodoFiltro = {
-        'Manhã': (horario) => {
-          const hora = parseInt(horario.split(':')[0]);
+        'Manhã': (data) => {
+          const hora = data.getHours();
           return hora >= 6 && hora < 12;
         },
-        'Tarde': (horario) => {
-          const hora = parseInt(horario.split(':')[0]);
+        'Tarde': (data) => {
+          const hora = data.getHours();
           return hora >= 12 && hora < 18;
         },
-        'Noite': (horario) => {
-          const hora = parseInt(horario.split(':')[0]);
+        'Noite': (data) => {
+          const hora = data.getHours();
           return hora >= 18 || hora < 6;
         }
       };
 
-      resultado = resultado.filter(item => 
-        periodoFiltro[filtroAtivo.HORÁRIO](item.horario)
+      resultado = resultado.filter(item =>
+        periodoFiltro[filtroAtivo.HORÁRIO](item.data) // Filtra por horário
       );
     }
 
@@ -143,9 +143,9 @@ function AtividadesPage() {
               atividadesFiltradas.map(atividade => (
                 <AtividadeCard
                   key={atividade.id}
-                  nome={atividade.nome}
-                  data={atividade.data}
-                  horario={atividade.horario}
+                  nome={`Login realizado por ${atividade.email}`}
+                  data={atividade.data.toLocaleDateString()} // Formata a data
+                  horario={atividade.data.toLocaleTimeString()} // Formata o horário
                 />
               ))
             ) : (
@@ -157,7 +157,7 @@ function AtividadesPage() {
         </main>
 
         <aside className={style.sidebar}>
-          <FiltroComponent 
+          <FiltroComponent
             tiposFiltro={tiposFiltro}
             onFiltroChange={handleFiltroChange}
           />
