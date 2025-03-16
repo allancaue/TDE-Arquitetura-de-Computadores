@@ -63,7 +63,7 @@
 }
 
 .forgotPassword span {
-  color: #F9822B;
+  color: rgb(253, 186, 255);
   cursor: pointer;
   font-weight: 600;
   text-decoration: underline;
