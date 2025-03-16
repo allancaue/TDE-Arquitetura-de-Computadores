@@ -1,46 +1,48 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
-.loginContainer {
+body {
+  background: linear-gradient(180deg, rgb(217, 13, 13) 0%, #ff1586 80%);
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(180deg, rgb(217, 13, 13) 0%, #ff1586 80%);
   font-family: "Poppins", sans-serif;
 }
 
-.loginCard {
+.cadastroCard {
   background-color: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
   border-radius: 20px;
-  padding: 30px;
+  padding: 165px;
   width: 90%;
-  max-width: 450px;
+  max-width: 800px;
+  height: 20%;
+  max-height: 400px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.loginHeader {
+.cadastroHeader {
   text-align: center;
   margin-bottom: 30px;
 }
 
-.title {
+h1 {
   color: white;
   font-weight: 700;
   font-size: 28px;
-  margin-bottom: 5px;
+  margin-bottom: 50px;
   letter-spacing: 1px;
 }
 
-.subtitle {
+p {
   color: white;
   font-size: 14px;
   font-weight: 400;
-  margin: 0;
+  margin: 50;
 }
 
 .formContainer {
@@ -53,26 +55,6 @@
 
 .formContainer > div {
   width: 100%;
-}
-
-.forgotPassword {
-  font-size: 12px;
-  color: white;
-  text-align: center;
-  margin: 10px 0;
-}
-
-.forgotPassword span {
-  color: #f9822b;
-  cursor: pointer;
-  font-weight: 600;
-  text-decoration: underline;
-}
-
-.buttonContainer {
-  display: flex;
-  justify-content: center;
-  margin-top: 15px;
 }
 
 /* Adaptações para responsividade */

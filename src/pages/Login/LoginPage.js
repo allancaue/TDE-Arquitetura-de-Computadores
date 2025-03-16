@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import Botao from '../../component/Botao/Botao';
-import Input from '../../component/Input/Input';
-import style from './LoginPage.module.css';
-import emailIcon from '../../assets/img/email-icon.svg';
-import passwordIcon from '../../assets/img/password-icon.svg';
-import eyeClosedIcon from '../../assets/img/eye-closed.svg';
-import eyeOpenIcon from '../../assets/img/eye-open.svg';
+import React, { useState } from "react";
+import Botao from "../../component/Botao/Botao";
+import Input from "../../component/Input/Input";
+import style from "./LoginPage.module.css";
+import emailIcon from "../../assets/img/email-icon.svg";
+import passwordIcon from "../../assets/img/password-icon.svg";
+import eyeClosedIcon from "../../assets/img/eye-closed.svg";
+import eyeOpenIcon from "../../assets/img/eye-open.svg";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -20,13 +21,19 @@ function LoginPage() {
   };
 
   const handleLogin = () => {
-    console.log('Tentativa de login com:', { email, senha });
+    console.log("Tentativa de login com:", { email, senha });
     // Aqui você adicionaria a lógica de autenticação
   };
 
   const handleEsqueciSenha = () => {
-    console.log('Esqueci minha senha');
+    console.log("Esqueci minha senha");
     // Implementar redirecionamento para página de recuperação de senha
+  };
+
+  const navigate = useNavigate(); // Inicializa a navegação
+
+  const handleIrParaCadastro = () => {
+    navigate("/cadastro"); // Redireciona para a página de cadastro
   };
 
   return (
@@ -36,7 +43,7 @@ function LoginPage() {
           <h1 className={style.title}>SISTEMA INOUT</h1>
           <p className={style.subtitle}>Entre com o login</p>
         </div>
-        
+
         <div className={style.formContainer}>
           <Input
             type="email"
@@ -45,7 +52,7 @@ function LoginPage() {
             onChange={handleEmailChange}
             imagen1={emailIcon}
           />
-          
+
           <Input
             type="password"
             placeholder="Senha"
@@ -55,11 +62,13 @@ function LoginPage() {
             imagen2={eyeClosedIcon}
             imagen3={eyeOpenIcon}
           />
-          
+
           <p className={style.forgotPassword}>
-            Não tem um login? <span onClick={handleEsqueciSenha}>Clique aqui</span> para solicitar acesso
+            Não tem um login?{" "}
+            <span onClick={handleIrParaCadastro}>Clique aqui</span> para
+            solicitar acesso
           </p>
-          
+
           <div className={style.buttonContainer}>
             <Botao color="orengeButton" onClick={handleLogin}>
               Entrar
