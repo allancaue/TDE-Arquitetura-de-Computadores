@@ -60,3 +60,15 @@
     background: linear-gradient(180deg, #FB4EA2, #F91E22);
     border-radius: 50px;
 }
+
+.container p{
+  color: white;
+  font-family: "Poppins", sans-serif;
+  justify-content: center;
+  flex-direction: column;
+  display: flex;
+  gap: 0.5rem;
+}
+
+
+

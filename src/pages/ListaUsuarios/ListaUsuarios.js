@@ -1,46 +1,12 @@
 import UserList from '../../component/UserList/UserList';
 import style from './ListaUsuarios.module.css';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFaceFrown } from '@fortawesome/free-solid-svg-icons';
 
 function ListaUsuarios() {
   const BANCO = [
-    {
-      name: "Joao Martins Filho filho",
-      email: "HtH0D@example.com"
-    },
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    },
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    },
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    },
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    },
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    }
-    ,
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    },
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    },
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    }
+    
+    
   ]
 
 
@@ -56,7 +22,10 @@ function ListaUsuarios() {
         {BANCO.length ? BANCO.map((item, index) => (
           <UserList key={index} name={item.name} email={item.email} />
         ))
-          : <p>Não existem logins pendentes.</p>
+          : <p>Não existem logins pendentes.
+            <FontAwesomeIcon icon={faFaceFrown} size='2xl' opacity="0.8" />  
+          </p>
+            
         }
 
       </div>
