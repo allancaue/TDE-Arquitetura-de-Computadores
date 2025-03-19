@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/Login/LoginPage";
 import AtividadesPage from "./pages/AtividadesPage/AtividadesPage";
 import CadastroPage from "./pages/Cadastro/CadastroPage";
+import ListaUsuarios from "./pages/ListaUsuarios/ListaUsuarios";
+import HomeAdm from "./pages/HomeAdm/HomeAdm";
 
 function App() {
   return (
