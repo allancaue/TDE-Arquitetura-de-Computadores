@@ -60,10 +60,11 @@ function CadastroPage() {
 
       // Salva os dados do usuário no Firestore
       await addDoc(collection(db, "usuarios"), {
-        uid: user.uid, // ID do usuário no Firebase Auth
+        uid: user.uid,
         nome: nome,
         email: email,
-        ativo: false, // Por padrão, o usuário não está ativo
+        ativo: false,
+        admin: false, // Por padrão, o usuário não é administrador
       });
 
       alert("Cadastro realizado com sucesso! Aguarde a aprovação do administrador.");

@@ -18,7 +18,7 @@ function LoginPage() {
 
   const handleLogin = async () => {
     try {
-      // Verifica se o usuário está ativo no Firestore
+      // Verifica se o usuário existe no Firestore
       const q = query(collection(db, "usuarios"), where("email", "==", email));
       const querySnapshot = await getDocs(q);
       if (querySnapshot.empty) {
@@ -27,7 +27,10 @@ function LoginPage() {
       }
 
       const userDoc = querySnapshot.docs[0];
-      if (!userDoc.data().ativo) {
+      const userData = userDoc.data();
+
+      // Verifica se o usuário é administrador ou está ativo
+      if (!userData.admin && !userData.ativo) {
         alert("Acesso negado. Entre em contato com o administrador.");
         return;
       }
@@ -36,15 +39,21 @@ function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, email, senha);
       console.log("Usuário logado com sucesso:", userCredential.user);
 
-      // Salva a atividade de login no Firestore
-      await addDoc(collection(db, "atividades"), {
-        nome: userDoc.data().nome, // Salva o nome do usuário
-        email: email,
-        data: new Date(), // Data atual
-      });
+      // Salva a atividade de login no Firestore apenas se o usuário não for administrador
+      if (!userData.admin) {
+        await addDoc(collection(db, "atividades"), {
+          nome: userData.nome,
+          email: email,
+          data: new Date(),
+        });
+      }
 
-      // Redireciona para a página inicial
-      window.location.href = '/';
+      // Redireciona o usuário
+      if (userData.admin) {
+        navigate("/homeAdm"); // Redireciona para a página de administração
+      } else {
+        navigate("/"); // Redireciona para a página inicial
+      }
     } catch (error) {
       console.error("Erro ao fazer login:", error.message);
       alert("Erro ao fazer login: " + error.message);

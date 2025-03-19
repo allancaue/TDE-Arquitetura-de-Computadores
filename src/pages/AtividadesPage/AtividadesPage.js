@@ -4,14 +4,17 @@ import FiltroComponent from '../../component/FiltroComponent/FiltroComponent';
 import style from './AtividadesPage.module.css';
 import searchIcon from '../../assets/img/search-icon.svg';
 import exitIcon from '../../assets/img/exit-icon.svg';
-import { db } from '../../firebase'; // Importe o Firestore
+import { db, auth } from '../../firebase'; // Importe o Firestore e o auth
 import { collection, getDocs, query, orderBy } from "firebase/firestore"; // Funções do Firestore
+import { signOut } from "firebase/auth"; // Importe a função de logout
+import { useNavigate } from 'react-router-dom'; // Para redirecionar o usuário
 
 function AtividadesPage() {
   const [atividades, setAtividades] = useState([]);
   const [filtroAtivo, setFiltroAtivo] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [atividadesFiltradas, setAtividadesFiltradas] = useState([]);
+  const navigate = useNavigate(); // Hook para redirecionamento
 
   // Tipos de filtro disponíveis
   const tiposFiltro = {
@@ -114,9 +117,16 @@ function AtividadesPage() {
     setSearchTerm(e.target.value);
   };
 
-  const handleSair = () => {
-    console.log('Saindo do sistema...');
-    // Implementar lógica de logout
+  // Função para deslogar o usuário
+  const handleSair = async () => {
+    try {
+      await signOut(auth); // Desloga o usuário
+      console.log('Usuário deslogado com sucesso.');
+      navigate('/'); // Redireciona para a página de login
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error.message);
+      alert('Erro ao fazer logout: ' + error.message);
+    }
   };
 
   return (
