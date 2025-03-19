@@ -1,7 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
-
-
 .container {
     position: relative;
     display: flex;
@@ -10,20 +8,50 @@
     width: 100%;
     border-radius: 20px;
     background-color: #FFFFFF;
-    padding: 10px 1rem;
+    padding: 15px 20px;
     color: red;
     font-family: "Poppins", serif;
     font-weight: 600;
-    font-size: 1rem; 
+    font-size: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
 }
 
-.buttonContent{
+.container:hover {
+    transform: scale(1.02); /* Efeito de escala ao passar o mouse */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Sombra mais pronunciada */
+}
+
+.container p {
+    color: red;
+    margin: 0;
+}
+
+.userInfo {
+    flex: 1;
+    display: flex;
+    gap: 20%;
+}
+
+.buttonContent {
     display: flex;
     gap: 0.5rem;
-    svg{
-        cursor: pointer;
-    }
+}
 
+.buttonContent button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.buttonContent svg {
+    transition: transform 0.2s ease;
+}
+
+.buttonContent svg:hover {
+    transform: scale(1.1); /* Efeito de escala ao passar o mouse no ícone */
 }
 
 /* VERSÕES RESPONSIVAS */
@@ -31,22 +59,26 @@
     .container {
         flex-direction: column;
         align-items: center;
-        text-align: center; /* Para centralizar o texto */
+        text-align: center;
     }
 
-    .buttonContent{
-        display: flex;
-        size: 100rem;
+    .buttonContent {
+        margin-top: 10px;
+    }
 
-}
-
+    .userInfo{
+        flex-direction: column;
+    }
 }
 
 @media (max-width: 768px) {
     .container {
         flex-direction: column;
         align-items: center;
-        text-align: center; /* Para centralizar o texto */
+        text-align: center;
     }
 
+    .userInfo{
+        flex-direction: column;
+    }
 }

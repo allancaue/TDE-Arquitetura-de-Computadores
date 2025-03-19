@@ -1,71 +1,62 @@
+import React, { useState, useEffect } from 'react';
 import UserList from '../../component/UserList/UserList';
 import style from './ListaUsuarios.module.css';
-
+import { db } from '../../firebase'; // Importe o Firestore
+import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 
 function ListaUsuarios() {
-  const BANCO = [
-    {
-      name: "Joao Martins Filho filho",
-      email: "HtH0D@example.com"
-    },
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    },
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    },
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    },
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    },
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    }
-    ,
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    },
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    },
-    {
-      name: "Joao",
-      email: "HtH0D@example.com"
-    }
-  ]
+  const [usuarios, setUsuarios] = useState([]);
 
+  // Busca os usuários do Firestore
+  useEffect(() => {
+    const fetchUsuarios = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "usuarios"));
+        const usuariosData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setUsuarios(usuariosData);
+      } catch (error) {
+        console.error("Erro ao buscar usuários:", error);
+      }
+    };
+
+    fetchUsuarios();
+  }, []);
+
+  // Função para alternar o status "ativo" do usuário
+  const toggleAtivo = async (id, ativo) => {
+    try {
+      await updateDoc(doc(db, "usuarios", id), { ativo: !ativo });
+      setUsuarios(usuarios.map(user => 
+        user.id === id ? { ...user, ativo: !ativo } : user
+      ));
+    } catch (error) {
+      console.error("Erro ao atualizar usuário:", error);
+    }
+  };
 
   return (
-
     <div className={style.container}>
       <div className={style.loginHeader}>
         <h1 className={style.title}>USUARIOS INOUT</h1>
-        <p className={style.subtitle}>Aceite ou recuse os cadastros </p>
-
+        <p className={style.subtitle}>Aceite ou recuse os cadastros</p>
       </div>
       <div className={style.fichas}>
-        {BANCO.length ? BANCO.map((item, index) => (
-          <UserList key={index} name={item.name} email={item.email} />
-        ))
-          : <p>Não existem logins pendentes.</p>
-        }
-
+        {usuarios.length ? usuarios.map((user) => (
+          <UserList
+            key={user.id}
+            id={user.id}
+            name={user.nome}
+            email={user.email}
+            ativo={user.ativo}
+            toggleAtivo={toggleAtivo}
+          />
+        )) : <p>Não existem logins pendentes.</p>}
       </div>
-
     </div>
-
-
-  )
-
+  );
 }
 
 export default ListaUsuarios;

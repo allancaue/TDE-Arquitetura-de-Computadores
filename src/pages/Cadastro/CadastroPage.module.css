@@ -1,4 +1,4 @@
-body {
+.boody {
   background: linear-gradient(180deg, rgb(217, 13, 13) 0%, #ff1586 80%);
   display: flex;
   justify-content: center;
@@ -48,7 +48,7 @@ p {
   gap: 15px;
 }
 
-.Input-group {
+.InputGroup {
   flex: 1; /* Para ocupar o mesmo espaço */
   min-width: 300px; /* Garante que os inputs fiquem bons em telas menores */
 }
@@ -59,6 +59,13 @@ p {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+}
+
+.erro {
+  color: #ff0408;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
 /* Responsividade */

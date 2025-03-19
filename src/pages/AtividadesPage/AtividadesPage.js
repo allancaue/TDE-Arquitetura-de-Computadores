@@ -42,12 +42,12 @@ function AtividadesPage() {
   useEffect(() => {
     const fetchAtividades = async () => {
       try {
-        const q = query(collection(db, "atividades"), orderBy("data", "desc")); // Ordena por data
+        const q = query(collection(db, "atividades"), orderBy("data", "desc"));
         const querySnapshot = await getDocs(q);
         const atividadesData = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
-          data: doc.data().data?.toDate(), // Converte o timestamp do Firestore para Date
+          data: doc.data().data?.toDate(),
         }));
         setAtividades(atividadesData);
         setAtividadesFiltradas(atividadesData);
@@ -66,7 +66,7 @@ function AtividadesPage() {
     // Aplicar filtro de pesquisa
     if (searchTerm) {
       resultado = resultado.filter(item =>
-        item.email.toLowerCase().includes(searchTerm.toLowerCase()) // Filtra por e-mail
+        item.nome.toLowerCase().includes(searchTerm.toLowerCase()) // Filtra por nome
       );
     }
 
@@ -143,7 +143,7 @@ function AtividadesPage() {
               atividadesFiltradas.map(atividade => (
                 <AtividadeCard
                   key={atividade.id}
-                  nome={`Login realizado por ${atividade.email}`}
+                  nome={`Login realizado por ${atividade.nome}`} // Exibe o nome do usuário
                   data={atividade.data.toLocaleDateString()} // Formata a data
                   horario={atividade.data.toLocaleTimeString()} // Formata o horário
                 />

@@ -1,36 +1,55 @@
-import React, { useState } from "react";
-import Botao from "../../component/Botao/Botao";
-import Input from "../../component/Input/Input";
-import style from "./LoginPage.module.css";
-import emailIcon from "../../assets/img/email-icon.svg";
-import passwordIcon from "../../assets/img/password-icon.svg";
-import eyeClosedIcon from "../../assets/img/eye-closed.svg";
-import eyeOpenIcon from "../../assets/img/eye-open.svg";
+import React, { useState } from 'react';
+import Botao from '../../component/Botao/Botao';
+import Input from '../../component/Input/Input';
+import style from './LoginPage.module.css';
+import emailIcon from '../../assets/img/email-icon.svg';
+import passwordIcon from '../../assets/img/password-icon.svg';
+import eyeClosedIcon from '../../assets/img/eye-closed.svg';
+import eyeOpenIcon from '../../assets/img/eye-open.svg';
+import { auth, db } from '../../firebase'; // Importe o Firestore
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const navigate = useNavigate();
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
+  const handleLogin = async () => {
+    try {
+      // Verifica se o usuário está ativo no Firestore
+      const q = query(collection(db, "usuarios"), where("email", "==", email));
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.empty) {
+        alert("Usuário não encontrado.");
+        return;
+      }
+
+      const userDoc = querySnapshot.docs[0];
+      if (!userDoc.data().ativo) {
+        alert("Acesso negado. Entre em contato com o administrador.");
+        return;
+      }
+
+      // Autentica o usuário
+      const userCredential = await signInWithEmailAndPassword(auth, email, senha);
+      console.log("Usuário logado com sucesso:", userCredential.user);
+
+      // Salva a atividade de login no Firestore
+      await addDoc(collection(db, "atividades"), {
+        nome: userDoc.data().nome, // Salva o nome do usuário
+        email: email,
+        data: new Date(), // Data atual
+      });
+
+      // Redireciona para a página inicial
+      window.location.href = '/';
+    } catch (error) {
+      console.error("Erro ao fazer login:", error.message);
+      alert("Erro ao fazer login: " + error.message);
+    }
   };
-
-  const handleSenhaChange = (e) => {
-    setSenha(e.target.value);
-  };
-
-  const handleLogin = () => {
-    console.log("Tentativa de login com:", { email, senha });
-    // Aqui você adicionaria a lógica de autenticação
-  };
-
-  const handleEsqueciSenha = () => {
-    console.log("Esqueci minha senha");
-    // Implementar redirecionamento para página de recuperação de senha
-  };
-
-  const navigate = useNavigate(); // Inicializa a navegação
 
   const handleIrParaCadastro = () => {
     navigate("/cadastro"); // Redireciona para a página de cadastro
@@ -43,32 +62,28 @@ function LoginPage() {
           <h1 className={style.title}>SISTEMA INOUT</h1>
           <p className={style.subtitle}>Entre com o login</p>
         </div>
-
         <div className={style.formContainer}>
           <Input
             type="email"
             placeholder="Email"
             value={email}
-            onChange={handleEmailChange}
+            onChange={(e) => setEmail(e.target.value)}
             imagen1={emailIcon}
           />
-
           <Input
             type="password"
             placeholder="Senha"
             value={senha}
-            onChange={handleSenhaChange}
+            onChange={(e) => setSenha(e.target.value)}
             imagen1={passwordIcon}
             imagen2={eyeClosedIcon}
             imagen3={eyeOpenIcon}
           />
-
           <p className={style.forgotPassword}>
             Não tem um login?{" "}
             <span onClick={handleIrParaCadastro}>Clique aqui</span> para
             solicitar acesso
           </p>
-
           <div className={style.buttonContainer}>
             <Botao color="orengeButton" onClick={handleLogin}>
               Entrar

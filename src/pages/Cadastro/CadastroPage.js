@@ -7,21 +7,18 @@ import emailIcon from "../../assets/img/email-icon.svg";
 import passwordIcon from "../../assets/img/password-icon.svg";
 import eyeClosedIcon from "../../assets/img/eye-closed.svg";
 import eyeOpenIcon from "../../assets/img/eye-open.svg";
+import { auth, db } from "../../firebase"; // Importe o Firebase Auth e Firestore
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { collection, addDoc } from "firebase/firestore";
 
 function CadastroPage() {
-  const [form, setForm] = useState({
-    nome: "",
-    email: "",
-    senha: "",
-    confirmarSenha: "",
-    mostrarSenha: false,
-    mostrarConfirmarSenha: false,
-  });
-
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [csenha, setCSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
+  const [erro, setErro] = useState("");
 
   const handleChangeName = (e) => {
     setNome(e.target.value);
@@ -34,37 +31,64 @@ function CadastroPage() {
   const handleChangeSenha = (e) => {
     setSenha(e.target.value);
   };
-  const handleChangeCSenha = (e) => {
-    setCSenha(e.target.value);
+
+  const handleChangeConfirmarSenha = (e) => {
+    setConfirmarSenha(e.target.value);
   };
 
   const toggleMostrarSenha = () => {
-    setForm({ ...form, mostrarSenha: !form.mostrarSenha });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (form.senha !== form.confirmarSenha) {
-      alert("As senhas não coincidem!");
-      return;
-    }
-    alert("Cadastro realizado com sucesso!");
+    setMostrarSenha(!mostrarSenha);
   };
 
   const toggleMostrarConfirmarSenha = () => {
-    setForm({ ...form, mostrarConfirmarSenha: !form.mostrarConfirmarSenha });
+    setMostrarConfirmarSenha(!mostrarConfirmarSenha);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Verifica se as senhas coincidem
+    if (senha !== confirmarSenha) {
+      setErro("As senhas não coincidem!");
+      return;
+    }
+
+    try {
+      // Cadastra o usuário no Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+      const user = userCredential.user;
+
+      // Salva os dados do usuário no Firestore
+      await addDoc(collection(db, "usuarios"), {
+        uid: user.uid, // ID do usuário no Firebase Auth
+        nome: nome,
+        email: email,
+        ativo: false, // Por padrão, o usuário não está ativo
+      });
+
+      alert("Cadastro realizado com sucesso! Aguarde a aprovação do administrador.");
+      setNome("");
+      setEmail("");
+      setSenha("");
+      setConfirmarSenha("");
+      setErro("");
+    } catch (error) {
+      console.error("Erro ao cadastrar usuário:", error.message);
+      setErro("Erro ao cadastrar usuário: " + error.message);
+    }
   };
 
   return (
-    <div className={style.body}>
+    <div className={style.boody}>
       <div className={style.cadastroCard}>
         <div className={style.cadastroHeader}>
           <h1 className={style.title}>CADASTRO</h1>
           <p className={style.subtitle}>
             Preencha os dados e espere a confirmação no email
           </p>
-          <form>
-            <div className="Input-group">
+          {erro && <p className={style.erro}>{erro}</p>}
+          <form onSubmit={handleSubmit}>
+            <div className={style.InputGroup}>
               <Input
                 type="text"
                 name="nome"
@@ -75,7 +99,7 @@ function CadastroPage() {
               />
             </div>
 
-            <div className="Input-group">
+            <div className={style.InputGroup}>
               <Input
                 type="email"
                 name="email"
@@ -86,9 +110,9 @@ function CadastroPage() {
               />
             </div>
 
-            <div className="Input-group">
+            <div className={style.InputGroup}>
               <Input
-                type={form.mostrarSenha ? "text" : "password"}
+                type={mostrarSenha ? "text" : "password"}
                 name="senha"
                 placeholder="Senha"
                 value={senha}
@@ -96,24 +120,26 @@ function CadastroPage() {
                 imagen1={passwordIcon}
                 imagen2={eyeClosedIcon}
                 imagen3={eyeOpenIcon}
+                onToggle={toggleMostrarSenha}
               />
             </div>
 
-            <div className="Input-group">
+            <div className={style.InputGroup}>
               <Input
-                type={form.mostrarConfirmarSenha ? "text" : "password"}
+                type={mostrarConfirmarSenha ? "text" : "password"}
                 name="confirmarSenha"
                 placeholder="Confirme a senha"
-                value={csenha}
-                onChange={handleChangeCSenha}
+                value={confirmarSenha}
+                onChange={handleChangeConfirmarSenha}
                 imagen1={passwordIcon}
                 imagen2={eyeClosedIcon}
                 imagen3={eyeOpenIcon}
+                onToggle={toggleMostrarConfirmarSenha}
               />
             </div>
 
             <div className={style.buttonContainer}>
-              <Botao color="orengeButton" onClick={handleSubmit}>
+              <Botao type="submit" color="orengeButton">
                 Cadastrar
               </Botao>
             </div>

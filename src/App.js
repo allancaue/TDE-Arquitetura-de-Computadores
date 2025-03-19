@@ -13,6 +13,8 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/cadastro" element={<CadastroPage />} />
         <Route path="/atividades" element={<AtividadesPage />} />
+        <Route path="/usuarios" element={<ListaUsuarios />} />
+        <Route path="/homeAdm" element={<HomeAdm />} />
         {/*<Route path="*" element={<NotFound />} />*/}{" "}
         {/* Rota para página 404 */}{" "}
         {/*Lembra de fazer a pagina de erro 404 n esquecer de forma nehuma */}
