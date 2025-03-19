@@ -18,8 +18,24 @@ function CadastroPage() {
     mostrarConfirmarSenha: false,
   });
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [csenha, setCSenha] = useState("");
+
+  const handleChangeName = (e) => {
+    setNome(e.target.value);
+  };
+
+  const handleChangeEmail = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handleChangeSenha = (e) => {
+    setSenha(e.target.value);
+  };
+  const handleChangeCSenha = (e) => {
+    setCSenha(e.target.value);
   };
 
   const toggleMostrarSenha = () => {
@@ -53,8 +69,8 @@ function CadastroPage() {
                 type="text"
                 name="nome"
                 placeholder="Nome Completo"
-                value={form.nome}
-                onChange={handleChange}
+                value={nome}
+                onChange={handleChangeName}
                 imagen1={badgeIcon}
               />
             </div>
@@ -64,8 +80,8 @@ function CadastroPage() {
                 type="email"
                 name="email"
                 placeholder="Email"
-                value={form.email}
-                onChange={handleChange}
+                value={email}
+                onChange={handleChangeEmail}
                 imagen1={emailIcon}
               />
             </div>
@@ -75,8 +91,8 @@ function CadastroPage() {
                 type={form.mostrarSenha ? "text" : "password"}
                 name="senha"
                 placeholder="Senha"
-                value={form.senha}
-                onChange={handleChange}
+                value={senha}
+                onChange={handleChangeSenha}
                 imagen1={passwordIcon}
                 imagen2={eyeClosedIcon}
                 imagen3={eyeOpenIcon}
@@ -88,8 +104,8 @@ function CadastroPage() {
                 type={form.mostrarConfirmarSenha ? "text" : "password"}
                 name="confirmarSenha"
                 placeholder="Confirme a senha"
-                value={form.confirmarSenha}
-                onChange={handleChange}
+                value={csenha}
+                onChange={handleChangeCSenha}
                 imagen1={passwordIcon}
                 imagen2={eyeClosedIcon}
                 imagen3={eyeOpenIcon}
