@@ -6,9 +6,10 @@ import emailIcon from '../../assets/img/email-icon.svg';
 import passwordIcon from '../../assets/img/password-icon.svg';
 import eyeClosedIcon from '../../assets/img/eye-closed.svg';
 import eyeOpenIcon from '../../assets/img/eye-open.svg';
-import { auth, db } from '../../firebase'; // Importe o Firestore
+import { auth, db, rtdb } from '../../firebase';
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
+import { doc, getDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { ref, push, set } from 'firebase/database';
 import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
@@ -18,42 +19,54 @@ function LoginPage() {
 
   const handleLogin = async () => {
     try {
-      // Verifica se o usuário existe no Firestore
-      const q = query(collection(db, "usuarios"), where("email", "==", email));
-      const querySnapshot = await getDocs(q);
-      if (querySnapshot.empty) {
-        alert("Usuário não encontrado.");
-        return;
-      }
-
-      const userDoc = querySnapshot.docs[0];
-      const userData = userDoc.data();
-
-      // Verifica se o usuário é administrador ou está ativo
-      if (!userData.admin && !userData.ativo) {
-        alert("Acesso negado. Entre em contato com o administrador.");
-        return;
-      }
-
       // Autentica o usuário
       const userCredential = await signInWithEmailAndPassword(auth, email, senha);
-      console.log("Usuário logado com sucesso:", userCredential.user);
+      const user = userCredential.user;
+      console.log("Usuário autenticado com sucesso:", user.uid);
 
-      // Salva a atividade de login no Firestore apenas se o usuário não for administrador
+      // Busca os dados do usuário no Firestore usando o UID
+      const userDocRef = doc(db, "usuarios", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (!userDocSnap.exists()) {
+        alert("Usuário não encontrado no Firestore.");
+        return;
+      }
+
+      const userData = userDocSnap.data();
+
+      // Verifica se o usuário está ativo
+      if (!userData.ativo) {
+        alert("Acesso negado. Aguarde a ativação pelo administrador.");
+        return;
+      }
+
+      // Se não for admin, salva a atividade de login
       if (!userData.admin) {
+        // Grava no Firestore
         await addDoc(collection(db, "atividades"), {
           nome: userData.nome,
-          email: email,
-          data: new Date(),
+          email: userData.email,
+          data: serverTimestamp(),  // Timestamp do Firebase
+        });
+
+        // Grava no Realtime Database
+        const atividadesRef = ref(rtdb, 'atividades');
+        const novaAtividadeRef = push(atividadesRef);
+        await set(novaAtividadeRef, {
+          nome: userData.nome,
+          email: userData.email,
+          data: Date.now(),  // timestamp em ms, o ESP32 pode interpretar
         });
       }
 
-      // Redireciona o usuário
+      // Redireciona conforme o perfil
       if (userData.admin) {
-        navigate("/homeAdm"); // Redireciona para a página de administração
+        navigate("/homeAdm");
       } else {
-        navigate("/"); // Redireciona para a página inicial
+        navigate("/");
       }
+
     } catch (error) {
       console.error("Erro ao fazer login:", error.message);
       alert("Erro ao fazer login: " + error.message);
@@ -61,7 +74,7 @@ function LoginPage() {
   };
 
   const handleIrParaCadastro = () => {
-    navigate("/cadastro"); // Redireciona para a página de cadastro
+    navigate("/cadastro");
   };
 
   return (
@@ -90,8 +103,7 @@ function LoginPage() {
           />
           <p className={style.forgotPassword}>
             Não tem um login?{" "}
-            <span onClick={handleIrParaCadastro}>Clique aqui</span> para
-            solicitar acesso
+            <span onClick={handleIrParaCadastro}>Clique aqui</span> para solicitar acesso
           </p>
           <div className={style.buttonContainer}>
             <Botao color="orengeButton" onClick={handleLogin}>

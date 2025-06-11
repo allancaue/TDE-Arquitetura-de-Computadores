@@ -7,9 +7,9 @@ import emailIcon from "../../assets/img/email-icon.svg";
 import passwordIcon from "../../assets/img/password-icon.svg";
 import eyeClosedIcon from "../../assets/img/eye-closed.svg";
 import eyeOpenIcon from "../../assets/img/eye-open.svg";
-import { auth, db } from "../../firebase"; // Importe o Firebase Auth e Firestore
+import { auth, db } from "../../firebase"; 
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { collection, addDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
 function CadastroPage() {
   const [nome, setNome] = useState("");
@@ -47,7 +47,6 @@ function CadastroPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Verifica se as senhas coincidem
     if (senha !== confirmarSenha) {
       setErro("As senhas não coincidem!");
       return;
@@ -58,13 +57,12 @@ function CadastroPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
       const user = userCredential.user;
 
-      // Salva os dados do usuário no Firestore
-      await addDoc(collection(db, "usuarios"), {
-        uid: user.uid,
+      // Salva os dados do usuário no Firestore, com o uid como ID do documento
+      await setDoc(doc(db, "usuarios", user.uid), {
         nome: nome,
         email: email,
         ativo: false,
-        admin: false, // Por padrão, o usuário não é administrador
+        admin: false
       });
 
       alert("Cadastro realizado com sucesso! Aguarde a aprovação do administrador.");

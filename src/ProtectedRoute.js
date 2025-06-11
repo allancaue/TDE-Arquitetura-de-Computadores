@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from './firebase';
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 
 const ProtectedRoute = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -11,37 +11,46 @@ const ProtectedRoute = ({ children }) => {
   useEffect(() => {
     const checkAdmin = async () => {
       const user = auth.currentUser;
+
       if (!user) {
-        navigate("/"); // Redireciona para a página de login se não estiver logado
+        navigate("/");  // Não autenticado, redireciona para login
         return;
       }
 
-      // Verifica se o usuário é administrador
-      const q = query(collection(db, "usuarios"), where("email", "==", user.email));
-      const querySnapshot = await getDocs(q);
-      if (querySnapshot.empty) {
-        navigate("/"); // Redireciona para a página de login se o usuário não for encontrado
-        return;
-      }
+      try {
+        const userDocRef = doc(db, "usuarios", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
 
-      const userDoc = querySnapshot.docs[0];
-      if (!userDoc.data().admin) {
-        navigate("/"); // Redireciona para a página inicial se não for admin
-        return;
-      }
+        if (!userDocSnap.exists()) {
+          console.warn("Usuário não encontrado no Firestore.");
+          navigate("/");
+          return;
+        }
 
-      setIsAdmin(true);
-      setLoading(false);
+        const userData = userDocSnap.data();
+
+        if (userData.admin) {
+          setIsAdmin(true);
+        } else {
+          navigate("/");  // Não é admin, redireciona
+        }
+
+      } catch (error) {
+        console.error("Erro ao verificar permissões:", error.message);
+        navigate("/");
+      } finally {
+        setLoading(false);
+      }
     };
 
     checkAdmin();
   }, [navigate]);
 
   if (loading) {
-    return <div>Carregando...</div>; // Exibe um loader enquanto verifica o admin
+    return <div>Carregando...</div>;
   }
 
-  return isAdmin ? children : null; // Renderiza o conteúdo da rota apenas se for admin
+  return isAdmin ? children : null;
 };
 
 export default ProtectedRoute;
