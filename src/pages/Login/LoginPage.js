@@ -1,3 +1,5 @@
+// LoginPage.js
+
 import React, { useState } from 'react';
 import Botao from '../../component/Botao/Botao';
 import Input from '../../component/Input/Input';
@@ -6,10 +8,9 @@ import emailIcon from '../../assets/img/email-icon.svg';
 import passwordIcon from '../../assets/img/password-icon.svg';
 import eyeClosedIcon from '../../assets/img/eye-closed.svg';
 import eyeOpenIcon from '../../assets/img/eye-open.svg';
-import { auth, db, rtdb } from '../../firebase';
+import { auth, db } from '../../firebase';
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { ref, push, set } from 'firebase/database';
+import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
@@ -19,12 +20,12 @@ function LoginPage() {
 
   const handleLogin = async () => {
     try {
-      // Autentica o usuário
+      // Autenticação
       const userCredential = await signInWithEmailAndPassword(auth, email, senha);
       const user = userCredential.user;
       console.log("Usuário autenticado com sucesso:", user.uid);
 
-      // Busca os dados do usuário no Firestore usando o UID
+      // Busca os dados do Firestore
       const userDocRef = doc(db, "usuarios", user.uid);
       const userDocSnap = await getDoc(userDocRef);
 
@@ -35,36 +36,17 @@ function LoginPage() {
 
       const userData = userDocSnap.data();
 
-      // Verifica se o usuário está ativo
+      // Verifica se está ativo
       if (!userData.ativo) {
         alert("Acesso negado. Aguarde a ativação pelo administrador.");
         return;
       }
 
-      // Se não for admin, salva a atividade de login
-      if (!userData.admin) {
-        // Grava no Firestore
-        await addDoc(collection(db, "atividades"), {
-          nome: userData.nome,
-          email: userData.email,
-          data: serverTimestamp(),  // Timestamp do Firebase
-        });
-
-        // Grava no Realtime Database
-        const atividadesRef = ref(rtdb, 'atividades');
-        const novaAtividadeRef = push(atividadesRef);
-        await set(novaAtividadeRef, {
-          nome: userData.nome,
-          email: userData.email,
-          data: Date.now(),  // timestamp em ms, o ESP32 pode interpretar
-        });
-      }
-
-      // Redireciona conforme o perfil
+      // Redireciona conforme o tipo de usuário
       if (userData.admin) {
         navigate("/homeAdm");
       } else {
-        navigate("/");
+        navigate("/homeUsuario");
       }
 
     } catch (error) {

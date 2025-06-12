@@ -10,6 +10,7 @@ import eyeOpenIcon from "../../assets/img/eye-open.svg";
 import { auth, db } from "../../firebase"; 
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 function CadastroPage() {
   const [nome, setNome] = useState("");
@@ -19,6 +20,7 @@ function CadastroPage() {
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
   const [erro, setErro] = useState("");
+  const navigate = useNavigate();
 
   const handleChangeName = (e) => {
     setNome(e.target.value);
@@ -138,7 +140,7 @@ function CadastroPage() {
             </div>
 
             <div className={style.buttonContainer}>
-              <Botao type="submit" color="orengeButton">
+              <Botao type="submit" color="orengeButton" onClick={navigate("/")}>
                 Cadastrar
               </Botao>
             </div>
